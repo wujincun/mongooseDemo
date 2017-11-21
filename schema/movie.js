@@ -19,6 +19,7 @@ MovieSchema.pre('save', function(next) {
 	} else {
 		this.meta.updateAt = Date.now();
 	}
+	next()
 })
 MovieSchema.statics = {
 	fetch: function(cb) {

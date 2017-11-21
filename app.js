@@ -16,6 +16,7 @@ let Movie = require('./model/movie');
 app.use(bodyParser.urlencoded({
 	extended: true
 })); //
+app.use(express.static(path.join(__dirname, 'js')));
 app.set('views', './views');
 app.set('view engine', 'jade');
 app.listen(port);
@@ -36,15 +37,6 @@ app.get('/list', function(req, res) {
 			res.render('list', {
 				title: '列表',
 				movies: movies
-					/*[{
-									title: '画皮',
-									id: 1,
-									poster: ''
-								}, {
-									title: '画皮2',
-									id: 2,
-									poster: ''
-								}]*/
 			})
 		})
 	})
@@ -55,15 +47,6 @@ app.get('/admin', function(req, res) {
 		movie: {
 			title: ''
 		}
-		/*[{
-						title: '画皮',
-						id: 1,
-						poster: ''
-					}, {
-						title: '画皮2',
-						id: 2,
-						poster: ''
-					}]*/
 	})
 })
 
@@ -102,17 +85,35 @@ app.post('/admin/movie/new', function(req, res) {
 	})
 	/*详情页*/
 app.get('/movie/:id', function(req, res) {
-	var id = req.params.id;
-	Movie.findById(id, function(err, movie) {
-		if (err) {
-			console.log(err)
-		}
-		console.log(movie)
-		res.render('detail', {
-			title: '详情页',
-			movie: {
-				title: movie.title,
+		var id = req.params.id;
+		Movie.findById(id, function(err, movie) {
+			if (err) {
+				console.log(err)
 			}
+			console.log(movie)
+			res.render('detail', {
+				title: '详情页',
+				movie: {
+					title: movie.title,
+				}
+			})
 		})
 	})
+	/*list delete*/
+app.delete('/admin/list', function(req, res) {
+	var id = req.query.id;
+	console.log(id)
+	if (id) {
+		Movie.remove({
+			_id: id
+		}, function(err, movie) {
+			if (err) {
+				console.log(err)
+			} else {
+				res.json({
+					success: 1
+				})
+			}
+		})
+	}
 })

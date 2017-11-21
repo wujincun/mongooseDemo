@@ -4,11 +4,13 @@
 
 # IntelliJ project files
 .idea
+.node_modules
 *.iml
 *.xml
 out
 gen
-.node_modules
 
 
 
+
+!/node_modules/

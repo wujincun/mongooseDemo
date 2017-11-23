@@ -1,0 +1,15 @@
+doctype 
+html
+	head
+		meta(charset='utf-8')
+		title #{title}
+	body
+		form(method="POST",action="/user/signup")
+			h1 注册
+			label(for="signupName") 用户名
+			input#signupName(type="text",name="user[name]")
+			label(for="signupPassword") 密码
+			input#signupPassword(type="text",name="user[password]")
+			button(type="submit") 提交
+
+

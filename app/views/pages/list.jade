@@ -1,0 +1,16 @@
+doctype 
+html
+	head
+		meta(charset='utf-8')
+		title #{title}
+	body
+		h1 #{title}
+		each item in movies
+			li(class='item-id-#{item._id}')     
+				.name #{item.title}
+				button.del(data-id="#{item._id}") 删除
+		if user
+			span 欢迎您，#{user.name}
+			a(href="/logout") 登出			
+script(src="/jquery-2.1.3.min.js")
+script(src="/admin.js")

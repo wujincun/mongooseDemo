@@ -1,119 +1,48 @@
-let express = require('express');
-let path = require('path');
-let bodyParser = require('body-parser');
-let port = process.env.PORT || 3000;
-let app = express();
+const express = require('express');
+const path = require('path');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 
-let _ = require('underscore');
+const port = process.env.PORT || 3000;
+const app = express();
+const dburl = 'mongodb://localhost/imooc';
 
-let mongoose = require('mongoose');
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/imooc', {
-	useMongoClient: true
+const mongoose = require('mongoose');
+mongoose.Promise = global.Promise; //???
+mongoose.connect(dburl, {
+	useMongoClient: true ///???
 });
-let Movie = require('./model/movie');
 
 app.use(bodyParser.urlencoded({
-	extended: true
-})); //
-app.use(express.static(path.join(__dirname, 'js')));
-app.set('views', './views');
+	extended: true //????
+})); //将表单里的数据格式化
+app.use(express.static(path.join(__dirname, 'js'))); //设置静态文件的默认路径
+
+app.use(cookieParser())
+app.use(session({ //依赖于cookieParser
+	secret: 'imooc', //防止篡改cookie
+	store: new MongoStore({
+		url: dburl,
+		collection: 'sessions'
+	}),
+	resave: false,
+	saveUninitialized: true,
+}))
+
+//配置为了开发环境下更好的追踪问题
+if ('development' === app.get('env')) {
+	let logger = require('morgan');
+	app.use(logger(':method :url :status'));
+	app.set('showStackError', true);
+	app.locals.pretty = true; //源代码格式化
+	mongoose.set('debug', true)
+}
+
+app.set('views', './app/views/pages');
 app.set('view engine', 'jade');
 app.listen(port);
 console.log('port' + port)
 
-//index page
-app.get('/', function(req, res) {
-	res.render('index', {
-		title: '首页'
-	})
-});
-//list page
-app.get('/list', function(req, res) {
-		Movie.fetch(function(err, movies) {
-			if (err) {
-				console.log(err)
-			}
-			res.render('list', {
-				title: '列表',
-				movies: movies
-			})
-		})
-	})
-	/*后台录入页*/
-app.get('/admin', function(req, res) {
-	res.render('admin', {
-		title: '',
-		movie: {
-			title: ''
-		}
-	})
-})
-
-//admine post movie
-
-app.post('/admin/movie/new', function(req, res) {
-		var id = req.body.movie._id;
-		var movieObj = req.body.movie;
-		var _movie;
-		if (id !== undefined) {
-			Movie.findById(id, function(err, movie) {
-				if (err) {
-					console.log(err)
-				}
-				_movie = _.extend(movie, movieObj)
-				_movie.save(function(err, movie) {
-					if (err) {
-						console.log(err)
-					}
-					res.redirect('/movie/' + movie._id)
-				})
-			})
-		} else {
-			_movie = new Movie({
-				title: movieObj.title,
-			})
-			console.log(_movie)
-			_movie.save(function(err, movie) {
-				console.log('qqq')
-				if (err) {
-					console.log(err)
-				}
-				res.redirect('/movie/' + movie._id)
-			})
-		}
-	})
-	/*详情页*/
-app.get('/movie/:id', function(req, res) {
-		var id = req.params.id;
-		Movie.findById(id, function(err, movie) {
-			if (err) {
-				console.log(err)
-			}
-			console.log(movie)
-			res.render('detail', {
-				title: '详情页',
-				movie: {
-					title: movie.title,
-				}
-			})
-		})
-	})
-	/*list delete*/
-app.delete('/admin/list', function(req, res) {
-	var id = req.query.id;
-	console.log(id)
-	if (id) {
-		Movie.remove({
-			_id: id
-		}, function(err, movie) {
-			if (err) {
-				console.log(err)
-			} else {
-				res.json({
-					success: 1
-				})
-			}
-		})
-	}
-})
+require('./router/index')(app)

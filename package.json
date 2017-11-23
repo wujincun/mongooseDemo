@@ -4,13 +4,19 @@
   "description": "node express mongoose",
   "main": "app.js",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
+    "connect-mongo": "^2.0.0",
     "express": "^4.16.2",
     "jade": "^1.11.0",
     "mongoose": "^4.13.2",
     "underscore": "^1.8.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "cookie-parser": "^1.4.3",
+    "express-session": "^1.15.6",
+    "morgan": "^1.9.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

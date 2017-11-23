@@ -1,0 +1,13 @@
+doctype 
+html
+	head
+		meta(charset='utf-8')
+		title #{title}
+	body
+		h1 #{title}
+		each item in movies
+			a(href="/movie/#{item._id}")     
+				.name #{item.title}
+		if user
+			span 欢迎您，#{user.name}
+			a(href="/logout") 登出		

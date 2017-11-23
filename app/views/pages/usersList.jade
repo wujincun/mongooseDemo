@@ -1,0 +1,13 @@
+doctype 
+html
+	head
+		meta(charset='utf-8')
+		title #{title}
+	body
+		h1 #{title}
+		each item in users
+			li(class='item-id-#{item._id}')     
+				.name #{item.name}
+				.password #{item.password}
+				button.del(data-id="#{item._id}") 删除
+
